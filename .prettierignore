@@ -1,0 +1,20 @@
+# Build outputs and dependencies
+node_modules/
+dist/
+build/
+.next/
+out/
+
+# Package manager lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Public assets & caches
+public/
+.cache/
+coverage/
+
+# Misc
+*.min.js
+*.min.css
