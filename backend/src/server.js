@@ -26,12 +26,10 @@ app.get('/api/check', (req, res) => {
 
 // MAKE APP READY FOR DEPLOYMENT
 if (ENV.NODE_ENV === 'production') {
-    const frontendDistPath = path.join(__dirname, 'frontend', 'dist');
-
-    app.use(express.static(frontendDistPath));
+    app.use(express.static('../frontend/dist'));
 
     app.get('/{*splat}', (req, res) => {
-        res.sendFile(path.join(frontendDistPath, 'index.html'));
+        res.sendFile(path.resolve('../frontend/dist/index.html'));
     });
 }
 
