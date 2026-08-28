@@ -14,7 +14,9 @@ const __dirname = path.resolve();
 
 // MIDDLEWARES
 app.use(express.json());
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+if (ENV.NODE_ENV !== 'production') {
+    app.use(cors({ origin: ENV.CLIENT_URL || 'http://localhost:5173', credentials: true }));
+}
 app.use('/api/inngest', serve({ client: inngest, functions }));
 
 // API CHECK ROUTE
@@ -24,10 +26,12 @@ app.get('/api/check', (req, res) => {
 
 // MAKE APP READY FOR DEPLOYMENT
 if (ENV.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../frontend/dist')));
+    const frontendDistPath = path.join(__dirname, 'frontend', 'dist');
 
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    app.use(express.static(frontendDistPath));
+
+    app.get('/{*splat}', (req, res) => {
+        res.sendFile(path.join(frontendDistPath, 'index.html'));
     });
 }
 
