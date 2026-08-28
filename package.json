@@ -1,0 +1,20 @@
+{
+  "name": "interview-craft",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "npm run start --prefix backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ritish-sharma-dev/InterviewCraft.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ritish-sharma-dev/InterviewCraft/issues"
+  },
+  "homepage": "https://github.com/ritish-sharma-dev/InterviewCraft#readme"
+}
