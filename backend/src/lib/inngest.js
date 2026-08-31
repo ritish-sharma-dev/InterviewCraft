@@ -1,16 +1,18 @@
 import { Inngest } from 'inngest';
 import { connectDB } from './db.js';
 import User from '../models/user.model.js';
+import { deleteStreamUser, upsertStreamUser } from "./stream.js";
 
 // CREATE A CLIENT TO SEND AND RECEIVE EVENTS
 export const inngest = new Inngest({ id: 'interviewCraft' });
 
 const createUserInDB = inngest.createFunction(
-    { id: "create-user-in-db", triggers: [{ event: "clerk/user.created" }] },
+    { id: 'create-user-in-db', triggers: [{ event: 'clerk/user.created' }] },
     async ({ event }) => {
         await connectDB();
 
-        const { id, email_addresses, first_name, last_name, image_url } = event.data;
+        const { id, email_addresses, first_name, last_name, image_url } =
+            event.data;
 
         const newUser = {
             clerkId: id,
@@ -20,16 +22,24 @@ const createUserInDB = inngest.createFunction(
         };
 
         await User.create(newUser);
+
+        await upsertStreamUser({
+            id: newUser.clerkId.toString(),
+            name: newUser.name,
+            image: newUser.profileImage,
+        });
     },
 );
 
 const deleteUserFromDB = inngest.createFunction(
-    { id: "delete-user-from-db", triggers: [{ event: "clerk/user.deleted" }] },
+    { id: 'delete-user-from-db', triggers: [{ event: 'clerk/user.deleted' }] },
     async ({ event }) => {
         await connectDB();
 
         const { id } = event.data;
         await User.deleteOne({ clerkId: id });
+
+        await deleteStreamUser(id.toString());
     },
 );
 
