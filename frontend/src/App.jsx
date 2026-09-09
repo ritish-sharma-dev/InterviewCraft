@@ -22,7 +22,6 @@ const App = () => {
         <Route path="/problem/:id" element={isSignedIn ? <ProblemPage /> : <Navigate to={"/"} />} />
         <Route path="/session/:id" element={isSignedIn ? <SessionPage /> : <Navigate to={"/"} />} />
       </Routes>
-
       <Toaster toastOptions={{ duration: 3000 }} />
     </div>
   )

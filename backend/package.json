@@ -17,6 +17,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "inngest": "^4.18.1",
+    "interview-craft": "file:..",
     "mongoose": "^9.9.3",
     "stream-chat": "^9.50.3"
   }

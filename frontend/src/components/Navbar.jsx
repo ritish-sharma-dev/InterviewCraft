@@ -5,48 +5,68 @@ import { UserButton } from "@clerk/clerk-react";
 function Navbar() {
   const location = useLocation();
 
+  console.log(location);
+
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-[#d8ded4] bg-[#f8f7f2]">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <Link to="/" className="flex items-center gap-3 text-lg font-black tracking-tight text-[#17322d]">
-          <span className="grid size-9 rotate-[-8deg] place-items-center rounded-xl bg-[#d4f36a] text-[#17322d] shadow-[3px_3px_0_#17322d]">
-            <SparklesIcon size={18} />
-          </span>
-          <span>
-            Interview <span className="text-[#ee6657]">Craft</span>
-          </span>
+    <nav className="bg-base-100/80 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50 shadow-lg">
+      <div className="max-w-7xl mx-auto p-4 flex items-center justify-between">
+        {/* LOGO */}
+        <Link
+          to="/"
+          className="group flex items-center gap-3 hover:scale-105 transition-transform duration-200"
+        >
+          <div className="size-10 rounded-xl bg-gradient-to-r from-primary via-secondary to-accent flex items-center justify-center shadow-lg ">
+            <SparklesIcon className="size-6 text-white" />
+          </div>
+
+          <div className="flex flex-col">
+            <span className="font-black text-xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
+              Talent IQ
+            </span>
+            <span className="text-xs text-base-content/60 font-medium -mt-1">Code Together</span>
+          </div>
         </Link>
 
-        <div className="flex items-center gap-2 text-sm font-bold text-[#6a7972] sm:gap-5">
+        <div className="flex items-center gap-1">
+          {/* PROBLEMS PAGE LINK */}
           <Link
-            to="/problems"
-            className={`rounded-md px-3 py-2 transition-colors ${
-              isActive("/problems")
-                ? "bg-[#17322d] text-white"
-                : "hover:text-[#ee6657]"
-            }`}
+            to={"/problems"}
+            className={`px-4 py-2.5 rounded-lg transition-all duration-200 
+              ${
+                isActive("/problems")
+                  ? "bg-primary text-primary-content"
+                  : "hover:bg-base-200 text-base-content/70 hover:text-base-content"
+              }
+              
+              `}
           >
-            <span className="flex items-center gap-2">
-              <BookOpenIcon size={16} /> Problems
-            </span>
+            <div className="flex items-center gap-x-2.5">
+              <BookOpenIcon className="size-4" />
+              <span className="font-medium hidden sm:inline">Problems</span>
+            </div>
           </Link>
 
+          {/* DASHBORD PAGE LINK */}
           <Link
-            to="/dashboard"
-            className={`rounded-md px-3 py-2 transition-colors ${
-              isActive("/dashboard")
-                ? "bg-[#17322d] text-white"
-                : "hover:text-[#ee6657]"
-            }`}
+            to={"/dashboard"}
+            className={`px-4 py-2.5 rounded-lg transition-all duration-200 
+              ${
+                isActive("/dashboard")
+                  ? "bg-primary text-primary-content"
+                  : "hover:bg-base-200 text-base-content/70 hover:text-base-content"
+              }
+              
+              `}
           >
-            <span className="flex items-center gap-2">
-              <LayoutDashboardIcon size={16} /> Dashboard
-            </span>
+            <div className="flex items-center gap-x-2.5">
+              <LayoutDashboardIcon className="size-4" />
+              <span className="font-medium hidden sm:inline">Dashbord</span>
+            </div>
           </Link>
 
-          <div className="ml-1 border-l border-[#d8ded4] pl-3">
+          <div className="ml-4 mt-2">
             <UserButton />
           </div>
         </div>
