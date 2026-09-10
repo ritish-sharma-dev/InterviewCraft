@@ -97,7 +97,6 @@ function SessionPage() {
 
   return (
     <div className="h-screen bg-base-100 flex flex-col">
-      <Navbar />
 
       <div className="flex-1">
         <Group orientation="horizontal">

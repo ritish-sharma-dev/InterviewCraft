@@ -27,9 +27,8 @@ function HomePage() {
 
             <div className="flex flex-col">
               <span className="font-black text-xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
-                Talent IQ
+                Interview Craft
               </span>
-              <span className="text-xs text-base-content/60 font-medium -mt-1">Code Together</span>
             </div>
           </Link>
 
@@ -50,15 +49,15 @@ function HomePage() {
           <div className="space-y-8">
             <div className="badge badge-primary badge-lg">
               <ZapIcon className="size-4" />
-              Real-time Collaboration
+              Live interview workspace
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-black leading-tight">
               <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                Code Together,
+                Where great
               </span>
               <br />
-              <span className="text-base-content">Learn Together</span>
+              <span className="text-base-content">thinking ships.</span>
             </h1>
 
             <p className="text-xl text-base-content/70 leading-relaxed max-w-xl">
