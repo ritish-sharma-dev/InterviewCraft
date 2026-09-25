@@ -1,4 +1,5 @@
 import { chatClient, streamClient } from '../lib/stream.js';
+import { createJoinCodeHash, generateJoinCode, verifyJoinCode } from '../lib/join-code.js';
 import Session from '../models/session.model.js';
 
 export async function createSession(req, res) {
@@ -13,6 +14,8 @@ export async function createSession(req, res) {
 
         // generate a unique call id for stream video
         const callId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+        const joinCode = generateJoinCode();
+        const { hash: joinCodeHash, salt: joinCodeSalt } = createJoinCodeHash(joinCode);
 
         // create session in db
         const session = await Session.create({
@@ -20,6 +23,8 @@ export async function createSession(req, res) {
             difficulty,
             host: userId,
             callId,
+            joinCodeHash,
+            joinCodeSalt,
         });
 
         // create stream video call
@@ -43,7 +48,7 @@ export async function createSession(req, res) {
 
         await channel.create();
 
-        res.status(201).json({ session });
+        res.status(201).json({ session, joinCode });
     } catch (error) {
         console.log('Error in createSession controller:', error.message);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -52,9 +57,10 @@ export async function createSession(req, res) {
 
 export async function getActiveSessions(_, res) {
     try {
-        const sessions = await Session.find({ status: 'active' })
+        const sessions = await Session.find({ status: 'active', locked: false })
             .populate('host', 'name profileImage email clerkId')
             .populate('participant', 'name profileImage email clerkId')
+            .select('-callId -joinCodeHash -joinCodeSalt')
             .sort({ createdAt: -1 })
             .limit(20);
 
@@ -94,7 +100,14 @@ export async function getSessionById(req, res) {
 
         if (!session) return res.status(404).json({ message: 'Session not found' });
 
-        res.status(200).json({ session });
+        const isMember =
+            session.host._id.toString() === req.user._id.toString() ||
+            session.participant?._id.toString() === req.user._id.toString();
+        const sessionData = session.toObject();
+
+        if (!isMember) delete sessionData.callId;
+
+        res.status(200).json({ session: sessionData });
     } catch (error) {
         console.log('Error in getSessionById controller:', error.message);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -107,7 +120,7 @@ export async function joinSession(req, res) {
         const userId = req.user._id;
         const clerkId = req.user.clerkId;
 
-        const session = await Session.findById(id);
+        const session = await Session.findById(id).select('+joinCodeHash +joinCodeSalt');
 
         if (!session) return res.status(404).json({ message: 'Session not found' });
 
@@ -121,16 +134,40 @@ export async function joinSession(req, res) {
             });
         }
 
-        // check if session is already full - has a participant
-        if (session.participant) return res.status(409).json({ message: 'Session is full' });
+        if (session.participant?.toString() === userId.toString()) {
+            const sessionData = session.toObject();
+            delete sessionData.joinCodeHash;
+            delete sessionData.joinCodeSalt;
+            return res.status(200).json({ session: sessionData });
+        }
 
-        session.participant = userId;
-        await session.save();
+        if (!req.body.joinCode) {
+            return res.status(400).json({ message: 'A session join code is required' });
+        }
 
-        const channel = chatClient.channel('messaging', session.callId);
+        if (!verifyJoinCode(req.body.joinCode, session.joinCodeHash, session.joinCodeSalt)) {
+            return res.status(403).json({ message: 'Invalid session join code' });
+        }
+
+        const joinedSession = await Session.findOneAndUpdate(
+            {
+                _id: id,
+                status: 'active',
+                locked: false,
+                participant: null,
+            },
+            { $set: { participant: userId } },
+            { new: true },
+        );
+
+        if (!joinedSession) {
+            return res.status(409).json({ message: 'Session is full or no longer joinable' });
+        }
+
+        const channel = chatClient.channel('messaging', joinedSession.callId);
         await channel.addMembers([clerkId]);
 
-        res.status(200).json({ session });
+        res.status(200).json({ session: joinedSession });
     } catch (error) {
         console.log('Error in joinSession controller:', error.message);
         res.status(500).json({ message: 'Internal Server Error' });

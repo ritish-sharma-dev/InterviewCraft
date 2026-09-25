@@ -20,16 +20,16 @@ export const sessionApi = {
     return response.data;
   },
 
-  joinSession: async (id) => {
-    const response = await axiosInstance.post(`/sessions/${id}/join`);
+  joinSession: async ({ id, joinCode }) => {
+    const response = await axiosInstance.post(`/sessions/${id}/join`, { joinCode });
     return response.data;
   },
   endSession: async (id) => {
     const response = await axiosInstance.post(`/sessions/${id}/end`);
     return response.data;
   },
-  getStreamToken: async () => {
-    const response = await axiosInstance.get(`/chat/token`);
+  getStreamToken: async (sessionId) => {
+    const response = await axiosInstance.get(`/chat/token/${sessionId}`);
     return response.data;
   },
 };

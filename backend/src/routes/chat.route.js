@@ -4,6 +4,6 @@ import { protectRoute } from '../middleware/protect.route.js';
 
 const router = express.Router();
 
-router.get('/token', protectRoute, getStreamToken);
+router.get('/token/:sessionId', protectRoute, getStreamToken);
 
 export default router;

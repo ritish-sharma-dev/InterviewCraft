@@ -10,18 +10,24 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
   const [chatClient, setChatClient] = useState(null);
   const [channel, setChannel] = useState(null);
   const [isInitializingCall, setIsInitializingCall] = useState(true);
+  const sessionId = session?._id;
+  const callId = session?.callId;
+  const sessionStatus = session?.status;
 
   useEffect(() => {
     let videoCall = null;
     let chatClientInstance = null;
 
     const initCall = async () => {
-      if (!session?.callId) return;
-      if (!isHost && !isParticipant) return;
-      if (session.status === "completed") return;
+      if (!callId || (!isHost && !isParticipant) || sessionStatus === "completed") {
+        if (!loadingSession) setIsInitializingCall(false);
+        return;
+      }
+
+      setIsInitializingCall(true);
 
       try {
-        const { token, userId, userName, userImage } = await sessionApi.getStreamToken();
+        const { token, userId, userName, userImage } = await sessionApi.getStreamToken(sessionId);
 
         const client = await initializeStreamClient(
           {
@@ -34,7 +40,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
 
         setStreamClient(client);
 
-        videoCall = client.call("default", session.callId);
+        videoCall = client.call("default", callId);
         await videoCall.join({ create: true });
         setCall(videoCall);
 
@@ -51,7 +57,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         );
         setChatClient(chatClientInstance);
 
-        const chatChannel = chatClientInstance.channel("messaging", session.callId);
+        const chatChannel = chatClientInstance.channel("messaging", callId);
         await chatChannel.watch();
         setChannel(chatChannel);
       } catch (error) {
@@ -62,7 +68,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
       }
     };
 
-    if (session && !loadingSession) initCall();
+    if (sessionId && !loadingSession) initCall();
 
     // cleanup - performance reasons
     return () => {
@@ -77,7 +83,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         }
       })();
     };
-  }, [session, loadingSession, isHost, isParticipant]);
+  }, [sessionId, callId, sessionStatus, loadingSession, isHost, isParticipant]);
 
   return {
     streamClient,

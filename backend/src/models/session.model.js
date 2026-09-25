@@ -30,6 +30,20 @@ const sessionSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+        joinCodeHash: {
+            type: String,
+            required: true,
+            select: false,
+        },
+        joinCodeSalt: {
+            type: String,
+            required: true,
+            select: false,
+        },
+        locked: {
+            type: Boolean,
+            default: false,
+        },
     },
     { timestamps: true },
 );

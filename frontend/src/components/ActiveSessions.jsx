@@ -9,8 +9,12 @@ import {
 } from "lucide-react";
 import { Link } from "react-router";
 import { getDifficultyBadgeClass } from "../lib/utils";
+import { useState } from "react";
+import JoinSessionModal from "./JoinSessionModal";
 
 function ActiveSessions({ sessions, isLoading, isUserInSession }) {
+  const [selectedSession, setSelectedSession] = useState(null);
+
   return (
     <div className="lg:col-span-2 card bg-base-100 border-2 border-primary/20 hover:border-primary/30 h-full">
       <div className="card-body">
@@ -83,11 +87,19 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
 
                   {session.participant && !isUserInSession(session) ? (
                     <button className="btn btn-disabled btn-sm">Full</button>
-                  ) : (
+                  ) : isUserInSession(session) ? (
                     <Link to={`/session/${session._id}`} className="btn btn-primary btn-sm gap-2">
-                      {isUserInSession(session) ? "Rejoin" : "Join"}
+                      Rejoin
                       <ArrowRightIcon className="size-4" />
                     </Link>
+                  ) : (
+                    <button
+                      onClick={() => setSelectedSession(session)}
+                      className="btn btn-primary btn-sm gap-2"
+                    >
+                      Join
+                      <ArrowRightIcon className="size-4" />
+                    </button>
                   )}
                 </div>
               </div>
@@ -103,6 +115,13 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
           )}
         </div>
       </div>
+
+      <JoinSessionModal
+        session={selectedSession}
+        isOpen={!!selectedSession}
+        onClose={() => setSelectedSession(null)}
+        onSuccess={() => setSelectedSession(null)}
+      />
     </div>
   );
 }

@@ -32,6 +32,7 @@ function DashboardPage() {
       {
         onSuccess: (data) => {
           setShowCreateModal(false);
+          sessionStorage.setItem(`session-join-code:${data.session._id}`, data.joinCode);
           navigate(`/session/${data.session._id}`);
         },
       }

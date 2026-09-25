@@ -1,15 +1,16 @@
 import { useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import { useEndSession, useJoinSession, useSessionById } from "../hooks/useSessions";
+import { useLocation, useNavigate, useParams } from "react-router";
+import { useEndSession, useSessionById } from "../hooks/useSessions";
 import { PROBLEMS } from "../data/problems";
 import { executeCode } from "../lib/piston";
-import Navbar from "../components/Navbar";
 import { Group, Panel, Separator } from "react-resizable-panels";
 import { getDifficultyBadgeClass } from "../lib/utils";
-import { Loader2Icon, LogOutIcon, PhoneOffIcon } from "lucide-react";
+import { CopyIcon, Loader2Icon, LogOutIcon, PhoneOffIcon } from "lucide-react";
+import toast from "react-hot-toast";
 import CodeEditorPanel from "../components/CodeEditorPanel";
 import OutputPanel from "../components/OutputPanel";
+import JoinSessionModal from "../components/JoinSessionModal";
 
 import useStreamClient from "../hooks/useStreamClient";
 import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
@@ -17,6 +18,7 @@ import VideoCallUI from "../components/VideoCallUI";
 
 function SessionPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
   const { user } = useUser();
   const [output, setOutput] = useState(null);
@@ -24,8 +26,10 @@ function SessionPage() {
 
   const { data: sessionData, isLoading: loadingSession, refetch } = useSessionById(id);
 
-  const joinSessionMutation = useJoinSession();
   const endSessionMutation = useEndSession();
+  const [joinCode] = useState(
+    () => location.state?.joinCode || sessionStorage.getItem(`session-join-code:${id}`) || "",
+  );
 
   const session = sessionData?.session;
   const isHost = session?.host?.clerkId === user?.id;
@@ -45,16 +49,6 @@ function SessionPage() {
 
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [code, setCode] = useState(problemData?.starterCode?.[selectedLanguage] || "");
-
-  // auto-join session if user is not already a participant and not the host
-  useEffect(() => {
-    if (!session || !user || loadingSession) return;
-    if (isHost || isParticipant) return;
-
-    joinSessionMutation.mutate(id, { onSuccess: refetch });
-
-    // remove the joinSessionMutation, refetch from dependencies to avoid infinite loop
-  }, [session, user, loadingSession, isHost, isParticipant, id]);
 
   // redirect the "participant" when session ends
   useEffect(() => {
@@ -95,6 +89,32 @@ function SessionPage() {
     }
   };
 
+  const handleCopyJoinCode = async () => {
+    await navigator.clipboard.writeText(joinCode);
+    toast.success("Join code copied");
+  };
+
+  if (session && !loadingSession && !isHost && !isParticipant) {
+    return (
+      <div className="min-h-screen bg-base-200 flex items-center justify-center p-6">
+        <JoinSessionModal
+          session={session}
+          isOpen
+          onClose={() => navigate("/dashboard")}
+          onSuccess={refetch}
+        />
+        <div className="card bg-base-100 shadow-xl max-w-md w-full">
+          <div className="card-body text-center">
+            <h1 className="card-title justify-center">Private Session</h1>
+            <p className="text-base-content/70">
+              A join code is required before you can access this interview room.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen bg-base-100 flex flex-col">
 
@@ -120,6 +140,23 @@ function SessionPage() {
                           Host: {session?.host?.name || "Loading..."} •{" "}
                           {session?.participant ? 2 : 1}/2 participants
                         </p>
+                        {isHost && joinCode && session?.status === "active" && (
+                          <div className="flex items-center gap-2 mt-3">
+                            <span className="text-sm font-semibold">Join code:</span>
+                            <code className="badge badge-lg tracking-[0.2em] font-mono">
+                              {joinCode}
+                            </code>
+                            <button
+                              type="button"
+                              onClick={handleCopyJoinCode}
+                              className="btn btn-ghost btn-xs"
+                              title="Copy join code"
+                            >
+                              <CopyIcon className="size-4" />
+                              Copy
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3">
