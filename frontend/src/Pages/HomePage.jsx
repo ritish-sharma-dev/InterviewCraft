@@ -1,160 +1,123 @@
 import { Link } from "react-router";
-import {
-  ArrowRightIcon,
-  CheckIcon,
-  Code2Icon,
-  SparklesIcon,
-  UsersIcon,
-  VideoIcon,
-  ZapIcon,
-} from "lucide-react";
-import { SignInButton } from "@clerk/clerk-react";
+import "../styles/components.css";
 
 function HomePage() {
   return (
-    <div className="bg-gradient-to-br from-base-100 via-base-200 to-base-300">
-      {/* NAVBAR */}
-      <nav className="bg-base-100/80 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto p-4 flex items-center justify-between">
-          {/* LOGO */}
-          <Link
-            to={"/"}
-            className="flex items-center gap-3 hover:scale-105 transition-transform duration-200"
-          >
-            <div className="size-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
-              <SparklesIcon className="size-6 text-white" />
-            </div>
+    <main className="home">
 
-            <div className="flex flex-col">
-              <span className="font-black text-xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
-                Interview Craft
-              </span>
-            </div>
+      <nav className="app-navbar home__navbar">
+        <div className="app-navbar__inner">
+          <Link to="/" className="brand-link">
+            <span className="brand-link__name">Interview Craft</span>
           </Link>
 
-          {/* AUTH BTN */}
-          <SignInButton mode="modal">
-            <button className="group px-6 py-3 bg-gradient-to-r from-primary to-secondary rounded-xl text-white font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center gap-2">
-              <span>Get Started</span>
-              <ArrowRightIcon className="size-4 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          </SignInButton>
+          <Link to="/login" className="home__get-started app-button app-button--primary">
+            Get Started
+          </Link>
         </div>
       </nav>
 
-      {/* HERO SECTION */}
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* LEFT CONTENT */}
-          <div className="space-y-8">
-            <div className="badge badge-primary badge-lg">
-              <ZapIcon className="size-4" />
+      <section className="home__hero">
+        <div className="home__hero-grid">
+
+          <div className="home__copy">
+            <div className="status-badge status-badge--primary status-badge--large">
               Live interview workspace
             </div>
 
-            <h1 className="text-5xl lg:text-7xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+            <h1 className="home__title">
+              <span className="brand-gradient-text">
                 Where great
               </span>
               <br />
-              <span className="text-base-content">thinking ships.</span>
+              <span>thinking ships.</span>
             </h1>
 
-            <p className="text-xl text-base-content/70 leading-relaxed max-w-xl">
-              The ultimate platform for collaborative coding interviews and pair programming.
-              Connect face-to-face, code in real-time, and ace your technical interviews.
+            <p className="home__description">
+              The ultimate platform for collaborative coding interviews and
+              pair programming. Connect face-to-face, code in real-time, and
+              ace your technical interviews.
             </p>
 
-            {/* FEATURE PILLS */}
-            <div className="flex flex-wrap gap-3">
-              <div className="badge badge-lg badge-outline">
-                <CheckIcon className="size-4 text-success" />
+            <div className="home__feature-pills">
+              <div className="status-badge status-badge--outline status-badge--large">
                 Live Video Chat
               </div>
-              <div className="badge badge-lg badge-outline">
-                <CheckIcon className="size-4 text-success" />
+
+              <div className="status-badge status-badge--outline status-badge--large">
                 Code Editor
               </div>
-              <div className="badge badge-lg badge-outline">
-                <CheckIcon className="size-4 text-success" />
+
+              <div className="status-badge status-badge--outline status-badge--large">
                 Multi-Language
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4">
-              <SignInButton mode="modal">
-                <button className="btn btn-primary btn-lg">
-                  Start Coding Now
-                  <ArrowRightIcon className="size-5" />
-                </button>
-              </SignInButton>
+            <div className="home__actions">
+              <Link to="/login" className="app-button app-button--primary app-button--large">
+                Start Coding Now
+              </Link>
             </div>
           </div>
 
-          {/* RIGHT IMAGE */}
           <img
             src="/hero.png"
             alt="CodeCollab Platform"
-            className="w-full h-auto rounded-3xl shadow-2xl border-4 border-base-100 hover:scale-105 transition-transform duration-500"
+            className="home__hero-image"
           />
         </div>
-      </div>
+      </section>
 
-      {/* FEATURES SECTION */}
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4">
-            Everything You Need to <span className="text-primary font-mono">Succeed</span>
+      <section className="home__features">
+        <div className="home__features-heading">
+          <h2 className="home__features-title">
+            Everything You Need to <span>Succeed</span>
           </h2>
-          <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
-            Powerful features designed to make your coding interviews seamless and productive
+
+          <p className="home__features-description">
+            Powerful features designed to make your coding interviews seamless
+            and productive
           </p>
         </div>
 
-        {/* FEATURES GRID */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="home__features-grid">
           {/* Feature 1 */}
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body items-center text-center">
-              <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-                <VideoIcon className="size-8 text-primary" />
-              </div>
-              <h3 className="card-title">HD Video Call</h3>
-              <p className="text-base-content/70">
-                Crystal clear video and audio for seamless communication during interviews
-              </p>
-            </div>
-          </div>
+          <article className="feature-card">
+            <div className="feature-card__body">
+              <h3 className="feature-card__title">HD Video Call</h3>
 
-          {/* Feature 2 */}
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body items-center text-center">
-              <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-                <Code2Icon className="size-8 text-primary" />
-              </div>
-              <h3 className="card-title">Live Code Editor</h3>
-              <p className="text-base-content/70">
-                Collaborate in real-time with syntax highlighting and multiple language support
+              <p className="feature-card__description">
+                Crystal clear video and audio for seamless communication during
+                interviews
               </p>
             </div>
-          </div>
+          </article>
 
-          {/* Feature 3 */}
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body items-center text-center">
-              <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-                <UsersIcon className="size-8 text-primary" />
-              </div>
-              <h3 className="card-title">Easy Collaboration</h3>
-              <p className="text-base-content/70">
-                Share your screen, discuss solutions, and learn from each other in real-time
+          <article className="feature-card">
+            <div className="feature-card__body">
+              <h3 className="feature-card__title">Live Code Editor</h3>
+
+              <p className="feature-card__description">
+                Collaborate in real-time with syntax highlighting and multiple
+                language support
               </p>
             </div>
-          </div>
+          </article>
+
+          <article className="feature-card">
+            <div className="feature-card__body">
+              <h3 className="feature-card__title">Easy Collaboration</h3>
+
+              <p className="feature-card__description">
+                Share your screen, discuss solutions, and learn from each other
+                in real-time
+              </p>
+            </div>
+          </article>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
+
 export default HomePage;
