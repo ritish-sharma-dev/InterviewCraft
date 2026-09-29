@@ -17,11 +17,12 @@ export async function getStreamToken(req, res) {
 
         if (!isMember) return res.status(403).json({ message: 'Session membership required' });
 
-        const token = chatClient.createToken(req.user.clerkId);
+        const userId = req.user.streamId || req.user._id.toString();
+        const token = chatClient.createToken(userId);
 
         res.status(200).json({
             token,
-            userId: req.user.clerkId,
+            userId,
             userName: req.user.name,
             userImage: req.user.profileImage,
         });

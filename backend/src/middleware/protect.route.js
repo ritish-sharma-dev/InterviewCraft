@@ -1,22 +1,24 @@
-import { getAuth } from '@clerk/express';
+import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
+import { ENV } from '../lib/env.js';
 
 export const protectRoute = async (req, res, next) => {
     try {
-        const { userId: clerkId } = getAuth(req);
+        const token = req.cookies?.auth_token;
 
-        if (!clerkId) return res.status(401).json({ message: 'Unauthorized - invalid token' });
+        if (!token) return res.status(401).json({ message: 'Authentication required' });
 
-        // FIND USER IN DB BY CLERK ID
-        const user = await User.findOne({ clerkId });
+        const payload = jwt.verify(token, ENV.JWT_SECRET);
+        const user = await User.findById(payload.sub);
 
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) return res.status(401).json({ message: 'Session expired' });
 
-        // ATTACH USER TO REQ
         req.user = user;
-
         next();
     } catch (error) {
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: 'Session expired' });
+        }
         console.error('Error in protectRoute middleware', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }

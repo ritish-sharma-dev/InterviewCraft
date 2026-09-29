@@ -1,6 +1,7 @@
 import Editor from "@monaco-editor/react";
 import { Loader2Icon, PlayIcon } from "lucide-react";
 import { LANGUAGE_CONFIG } from "../data/problems";
+import "../styles/components.css";
 
 function CodeEditorPanel({
   selectedLanguage,
@@ -9,17 +10,24 @@ function CodeEditorPanel({
   onLanguageChange,
   onCodeChange,
   onRunCode,
+  readOnly = false,
 }) {
   return (
-    <div className="h-full bg-base-300 flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 bg-base-100 border-t border-base-300">
-        <div className="flex items-center gap-3">
+    <section className="editor">
+      <div className="editor__toolbar">
+        <div className="editor__languages">
+          {readOnly && <span className="editor__live-label">Candidate code · live</span>}
           <img
             src={LANGUAGE_CONFIG[selectedLanguage].icon}
             alt={LANGUAGE_CONFIG[selectedLanguage].name}
-            className="size-6"
+            className="editor__language-icon"
           />
-          <select className="select select-sm" value={selectedLanguage} onChange={onLanguageChange}>
+          <select
+            className="form-select form-select--compact"
+            value={selectedLanguage}
+            onChange={onLanguageChange}
+            disabled={readOnly}
+          >
             {Object.entries(LANGUAGE_CONFIG).map(([key, lang]) => (
               <option key={key} value={key}>
                 {lang.name}
@@ -28,22 +36,22 @@ function CodeEditorPanel({
           </select>
         </div>
 
-        <button className="btn btn-primary btn-sm gap-2" disabled={isRunning} onClick={onRunCode}>
+        <button className="app-button app-button--primary app-button--small" disabled={isRunning} onClick={onRunCode}>
           {isRunning ? (
             <>
-              <Loader2Icon className="size-4 animate-spin" />
+              <Loader2Icon className="app-icon app-icon--small app-icon--spinning" />
               Running...
             </>
           ) : (
             <>
-              <PlayIcon className="size-4" />
+              <PlayIcon className="app-icon app-icon--small" />
               Run Code
             </>
           )}
         </button>
       </div>
 
-      <div className="flex-1">
+      <div className="editor__code">
         <Editor
           height={"100%"}
           language={LANGUAGE_CONFIG[selectedLanguage].monacoLang}
@@ -56,10 +64,11 @@ function CodeEditorPanel({
             scrollBeyondLastLine: false,
             automaticLayout: true,
             minimap: { enabled: false },
+            readOnly,
           }}
         />
       </div>
-    </div>
+    </section>
   );
 }
 export default CodeEditorPanel;

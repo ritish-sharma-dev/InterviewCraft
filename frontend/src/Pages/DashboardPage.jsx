@@ -1,33 +1,29 @@
 import { useNavigate } from "react-router";
-import { useUser } from "@clerk/clerk-react";
 import { useState } from "react";
-import { useActiveSessions, useCreateSession, useMyRecentSessions } from "../hooks/useSessions";
+import { ArrowRightIcon, LinkIcon } from "lucide-react";
+import { useCreateSession, useMyRecentSessions } from "../hooks/useSessions";
 
 import Navbar from "../components/Navbar";
 import WelcomeSection from "../components/WelcomeSection";
-import StatsCards from "../components/StatsCards";
-import ActiveSessions from "../components/ActiveSessions";
 import RecentSessions from "../components/RecentSessions";
 import CreateSessionModal from "../components/CreateSessionModal";
+import "../styles/components.css";
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const { user } = useUser();
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [roomConfig, setRoomConfig] = useState({ problem: "", difficulty: "" });
+  const [roomName, setRoomName] = useState("");
+  const [sessionLink, setSessionLink] = useState("");
+  const [joinLinkError, setJoinLinkError] = useState("");
 
   const createSessionMutation = useCreateSession();
 
-  const { data: activeSessionsData, isLoading: loadingActiveSessions } = useActiveSessions();
   const { data: recentSessionsData, isLoading: loadingRecentSessions } = useMyRecentSessions();
 
   const handleCreateRoom = () => {
-    if (!roomConfig.problem || !roomConfig.difficulty) return;
-
     createSessionMutation.mutate(
       {
-        problem: roomConfig.problem,
-        difficulty: roomConfig.difficulty.toLowerCase(),
+        name: roomName,
       },
       {
         onSuccess: (data) => {
@@ -39,44 +35,75 @@ function DashboardPage() {
     );
   };
 
-  const activeSessions = activeSessionsData?.sessions || [];
   const recentSessions = recentSessionsData?.sessions || [];
 
-  const isUserInSession = (session) => {
-    if (!user.id) return false;
+  const handleJoinByLink = (event) => {
+    event.preventDefault();
+    const input = sessionLink.trim();
+    let sessionId = input.match(/^[a-f\d]{24}$/i)?.[0];
+    let joinCode = "";
 
-    return session.host?.clerkId === user.id || session.participant?.clerkId === user.id;
+    if (!sessionId) {
+      try {
+        const url = new URL(input, window.location.origin);
+        sessionId = url.pathname.match(/\/session\/([a-f\d]{24})(?:\/|$)/i)?.[1];
+        joinCode = new URLSearchParams(url.hash.slice(1)).get("joinCode")?.trim().toUpperCase() || "";
+      } catch {
+        setJoinLinkError("Enter a valid session link or ID.");
+        return;
+      }
+    }
+
+    if (!sessionId) {
+      setJoinLinkError("Enter a valid session link or ID.");
+      return;
+    }
+
+    setJoinLinkError("");
+    navigate(`/session/${sessionId}`, joinCode ? { state: { joinCode } } : undefined);
   };
 
   return (
     <>
-      <div className="min-h-screen bg-base-300">
+      <main className="dashboard">
         <Navbar />
         <WelcomeSection onCreateSession={() => setShowCreateModal(true)} />
 
-        {/* Grid layout */}
-        <div className="container mx-auto px-6 pb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <StatsCards
-              activeSessionsCount={activeSessions.length}
-              recentSessionsCount={recentSessions.length}
-            />
-            <ActiveSessions
-              sessions={activeSessions}
-              isLoading={loadingActiveSessions}
-              isUserInSession={isUserInSession}
-            />
-          </div>
-
+        <div className="dashboard__content">
+          <form className="dashboard-join" onSubmit={handleJoinByLink}>
+            <label className="dashboard-join__field">
+              <LinkIcon className="dashboard-join__icon" aria-hidden="true" />
+              <input
+                type="text"
+                value={sessionLink}
+                onChange={(event) => {
+                  setSessionLink(event.target.value);
+                  setJoinLinkError("");
+                }}
+                placeholder="Paste a session link or ID"
+                aria-label="Session link or ID"
+                aria-invalid={!!joinLinkError}
+                aria-describedby={joinLinkError ? "dashboard join error" : undefined}
+              />
+            </label>
+            <button type="submit" className="app-button app-button--primary">
+              Join Session
+            </button>
+            {joinLinkError && (
+              <p className="dashboard-join__error" id="dashboard-join-error" role="alert">
+                {joinLinkError}
+              </p>
+            )}
+          </form>
           <RecentSessions sessions={recentSessions} isLoading={loadingRecentSessions} />
         </div>
-      </div>
+      </main>
 
       <CreateSessionModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
-        roomConfig={roomConfig}
-        setRoomConfig={setRoomConfig}
+        name={roomName}
+        setName={setRoomName}
         onCreateRoom={handleCreateRoom}
         isCreating={createSessionMutation.isPending}
       />

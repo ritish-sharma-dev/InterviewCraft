@@ -23,7 +23,6 @@ export const initializeStreamClient = async (user, token) => {
 
   return client;
 };
-
 export const disconnectStreamClient = async () => {
   if (client) {
     try {

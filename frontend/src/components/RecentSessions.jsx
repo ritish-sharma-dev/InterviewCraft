@@ -1,74 +1,73 @@
 import { Code2, Clock, Users, Trophy, Loader } from "lucide-react";
 import { getDifficultyBadgeClass } from "../lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import "../styles/components.css";
 
 function RecentSessions({ sessions, isLoading }) {
   return (
-    <div className="card bg-base-100 border-2 border-accent/20 hover:border-accent/30 mt-8">
-      <div className="card-body">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-gradient-to-br from-accent to-secondary rounded-xl">
-            <Clock className="w-5 h-5 text-white" />
+    <section className="history">
+      <div className="history__body">
+        <div className="history__heading">
+          <div className="history__mark">
+            <Clock className="history__heading-icon" />
           </div>
-          <h2 className="text-2xl font-black">Your Past Sessions</h2>
+          <h2 className="history__title">Your Past Sessions</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="history__grid">
           {isLoading ? (
-            <div className="col-span-full flex items-center justify-center py-20">
-              <Loader className="w-10 h-10 animate-spin text-primary" />
+            <div className="history__loading">
+              <Loader className="app-icon app-icon--large app-icon--spinning app-icon--primary" />
             </div>
           ) : sessions.length > 0 ? (
             sessions.map((session) => (
               <div
                 key={session._id}
-                className={`card relative ${
-                  session.status === "active"
-                    ? "bg-success/10 border-success/30 hover:border-success/60"
-                    : "bg-base-200 border-base-300 hover:border-primary/30"
-                }`}
+                className={`history-card ${session.status === "active"
+                    ? "history-card--active"
+                    : "history-card--complete"
+                  }`}
               >
                 {session.status === "active" && (
-                  <div className="absolute top-3 right-3">
-                    <div className="badge badge-success gap-1">
-                      <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
+                  <div className="history-card__active-label">
+                    <div className="status-badge status-badge--success">
+                      <div className="history-card__pulse-dot" />
                       ACTIVE
                     </div>
                   </div>
                 )}
 
-                <div className="card-body p-5">
-                  <div className="flex items-start gap-3 mb-4">
+                <div className="history-card__body">
+                  <div className="history-card__summary">
                     <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        session.status === "active"
-                          ? "bg-gradient-to-br from-success to-success/70"
-                          : "bg-gradient-to-br from-primary to-secondary"
-                      }`}
+                      className={`history-card__mark ${session.status === "active"
+                          ? "history-card__mark--active"
+                          : "history-card__mark--complete"
+                        }`}
                     >
-                      <Code2 className="w-6 h-6 text-white" />
+                      <Code2 className="history-card__icon" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-base mb-1 truncate">{session.problem}</h3>
+                    <div className="history-card__details">
+                      <h3 className="history-card__problem">{session.problem}</h3>
                       <span
-                        className={`badge badge-sm ${getDifficultyBadgeClass(session.difficulty)}`}
+                        className={`status-badge status-badge--small ${getDifficultyBadgeClass(session.difficulty)}`}
                       >
                         {session.difficulty}
                       </span>
                     </div>
                   </div>
 
-                  <div className="space-y-2 text-sm opacity-80 mb-4">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
+                  <div className="history-card__metadata">
+                    <div className="history-card__meta-item">
+                      <Clock className="history-card__meta-icon" />
                       <span>
                         {formatDistanceToNow(new Date(session.createdAt), {
                           addSuffix: true,
                         })}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4" />
+                    <div className="history-card__meta-item">
+                      <Users className="history-card__meta-icon" />
                       <span>
                         {session.participant ? "2" : "1"} participant
                         {session.participant ? "s" : ""}
@@ -76,9 +75,9 @@ function RecentSessions({ sessions, isLoading }) {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-base-300">
-                    <span className="text-xs font-semibold opacity-80 uppercase">Completed</span>
-                    <span className="text-xs opacity-40">
+                  <div className="history-card__footer">
+                    <span className="history-card__status">Completed</span>
+                    <span className="history-card__date">
                       {new Date(session.updatedAt).toLocaleDateString()}
                     </span>
                   </div>
@@ -86,17 +85,17 @@ function RecentSessions({ sessions, isLoading }) {
               </div>
             ))
           ) : (
-            <div className="col-span-full text-center py-16">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-accent/20 to-secondary/20 rounded-3xl flex items-center justify-center">
-                <Trophy className="w-10 h-10 text-accent/50" />
+            <div className="history__empty">
+              <div className="history__empty-mark">
+                <Trophy className="history__empty-icon" />
               </div>
-              <p className="text-lg font-semibold opacity-70 mb-1">No sessions yet</p>
-              <p className="text-sm opacity-50">Start your coding journey today!</p>
+              <p className="history__empty-title">No sessions yet</p>
+              <p className="history__empty-hint">Start your coding journey today!</p>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

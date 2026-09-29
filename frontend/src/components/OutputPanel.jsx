@@ -1,26 +1,28 @@
+import "../styles/components.css";
+
 function OutputPanel({ output }) {
   return (
-    <div className="h-full bg-base-100 flex flex-col">
-      <div className="px-4 py-2 bg-base-200 border-b border-base-300 font-semibold text-sm">
+    <section className="output-panel">
+      <div className="output-panel__heading">
         Output
       </div>
-      <div className="flex-1 overflow-auto p-4">
+      <div className="output-panel__content">
         {output === null ? (
-          <p className="text-base-content/50 text-sm">Click "Run Code" to see the output here...</p>
+          <p className="output-panel__placeholder">Click "Run Code" to see the output here...</p>
         ) : output.success ? (
-          <pre className="text-sm font-mono text-success whitespace-pre-wrap">{output.output}</pre>
+          <pre className="output-panel__result">{output.output}</pre>
         ) : (
           <div>
             {output.output && (
-              <pre className="text-sm font-mono text-base-content whitespace-pre-wrap mb-2">
+              <pre className="output-panel__result output-panel__result--partial">
                 {output.output}
               </pre>
             )}
-            <pre className="text-sm font-mono text-error whitespace-pre-wrap">{output.error}</pre>
+            <pre className="output-panel__error">{output.error}</pre>
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 export default OutputPanel;

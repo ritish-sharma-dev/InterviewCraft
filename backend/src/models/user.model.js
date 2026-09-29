@@ -10,15 +10,21 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
+            lowercase: true,
+            trim: true,
         },
         profileImage: {
             type: String,
             default: '',
         },
-        clerkId: {
+        passwordHash: {
             type: String,
-            required: true,
+            select: false,
+        },
+        streamId: {
+            type: String,
             unique: true,
+            sparse: true,
         },
     },
     { timestamps: true },

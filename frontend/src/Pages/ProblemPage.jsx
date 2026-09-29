@@ -11,6 +11,7 @@ import { executeCode } from "../lib/piston";
 
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
+import "../styles/components.css";
 
 function ProblemPage() {
   const { id } = useParams();
@@ -122,10 +123,10 @@ function ProblemPage() {
   };
 
   return (
-    <div className="h-screen bg-base-100 flex flex-col">
+    <main className="workspace">
       <Navbar />
 
-      <div className="flex-1 min-h-0">
+      <div className="workspace__panels">
         {/* Main horizontal layout */}
         <Group orientation="horizontal">
           {/* Left panel - Problem Description */}
@@ -139,7 +140,7 @@ function ProblemPage() {
           </Panel>
 
           {/* Horizontal resize handle */}
-          <Separator className="w-2 bg-base-300 hover:bg-primary transition-colors cursor-col-resize" />
+          <Separator className="workspace-resize-handle workspace-resize-handle--vertical" />
 
           {/* Right panel - Code Editor + Output */}
           <Panel defaultSize={60} minSize={30}>
@@ -158,7 +159,7 @@ function ProblemPage() {
               </Panel>
 
               {/* Vertical resize handle */}
-              <Separator className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize" />
+              <Separator className="workspace-resize-handle workspace-resize-handle--horizontal" />
 
               {/* Bottom panel - Output */}
               <Panel defaultSize={30} minSize={30}>
@@ -168,7 +169,7 @@ function ProblemPage() {
           </Panel>
         </Group>
       </div>
-    </div>
+    </main>
   );
 }
 

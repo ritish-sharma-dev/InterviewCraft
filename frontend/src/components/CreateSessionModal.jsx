@@ -1,92 +1,65 @@
-import { Code2Icon, LoaderIcon, PlusIcon } from "lucide-react";
-import { PROBLEMS } from "../data/problems";
+import { LoaderIcon, PlusIcon } from "lucide-react";
+import "../styles/components.css";
 
 function CreateSessionModal({
   isOpen,
   onClose,
-  roomConfig,
-  setRoomConfig,
+  name,
+  setName,
   onCreateRoom,
   isCreating,
 }) {
-  const problems = Object.values(PROBLEMS);
-
   if (!isOpen) return null;
 
   return (
-    <div className="modal modal-open">
-      <div className="modal-box max-w-2xl">
-        <h3 className="font-bold text-2xl mb-6">Create New Session</h3>
+    <div className="modal-overlay">
+      <div className="modal-dialog modal-dialog--wide">
+        <h3 className="modal-dialog__title">Create New Session</h3>
 
-        <div className="space-y-8">
-          {/* PROBLEM SELECTION */}
-          <div className="space-y-2">
-            <label className="label">
-              <span className="label-text font-semibold">Select Problem</span>
-              <span className="label-text-alt text-error">*</span>
+        <div className="session-form">
+          <div className="session-form__field">
+            <label className="session-form__label" htmlFor="session-name">
+              <span className="session-form__label-text">Session Name</span>
+              <span className="session-form__required">Required</span>
             </label>
-
-            <select
-              className="select w-full"
-              value={roomConfig.problem}
-              onChange={(e) => {
-                const selectedProblem = problems.find((p) => p.title === e.target.value);
-                setRoomConfig({
-                  difficulty: selectedProblem.difficulty,
-                  problem: e.target.value,
-                });
-              }}
-            >
-              <option value="" disabled>
-                Choose a coding problem...
-              </option>
-
-              {problems.map((problem) => (
-                <option key={problem.id} value={problem.title}>
-                  {problem.title} ({problem.difficulty})
-                </option>
-              ))}
-            </select>
+            <input
+              id="session-name"
+              className="form-control"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="e.g. Frontend Engineer Interview"
+              minLength={3}
+              maxLength={80}
+              required
+            />
           </div>
 
-          {/* ROOM SUMMARY */}
-          {roomConfig.problem && (
-            <div className="alert alert-success">
-              <Code2Icon className="size-5" />
-              <div>
-                <p className="font-semibold">Room Summary:</p>
-                <p>
-                  Problem: <span className="font-medium">{roomConfig.problem}</span>
-                </p>
-                <p>
-                  Max Participants: <span className="font-medium">2 (1-on-1 session)</span>
-                </p>
-              </div>
-            </div>
-          )}
+          <p className="session-form__hint">
+            Private session. Share its room code with your interview partner.
+          </p>
         </div>
 
-        <div className="modal-action">
-          <button className="btn btn-ghost" onClick={onClose}>
+        <div className="modal-dialog__actions">
+          <button className="app-button app-button--ghost" onClick={onClose}>
             Cancel
           </button>
 
           <button
-            className="btn btn-primary gap-2"
+            className="app-button app-button--primary"
             onClick={onCreateRoom}
-            disabled={isCreating || !roomConfig.problem}
+            disabled={isCreating || name.trim().length < 3}
           >
             {isCreating ? (
-              <LoaderIcon className="size-5 animate-spin" />
+              <LoaderIcon className="app-icon app-icon--medium app-icon--spinning" />
             ) : (
-              <PlusIcon className="size-5" />
+              <PlusIcon className="app-icon app-icon--medium" />
             )}
 
             {isCreating ? "Creating..." : "Create"}
           </button>
         </div>
       </div>
-      <div className="modal-backdrop" onClick={onClose}></div>
+      <div className="modal-overlay__backdrop" onClick={onClose}></div>
     </div>
   );
 }

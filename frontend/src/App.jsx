@@ -1,7 +1,8 @@
-import React from 'react';
-import { useUser } from "@clerk/clerk-react";
 import { Navigate, Route, Routes } from "react-router";
+import { useAuth } from "./auth/useAuth";
 import HomePage from './Pages/HomePage';
+import LoginPage from './Pages/LoginPage';
+import SignupPage from './Pages/SignupPage';
 import { Toaster } from "react-hot-toast";
 import DashboardPage from "./Pages/DashboardPage";
 import ProblemPage from "./Pages/ProblemPage";
@@ -9,18 +10,20 @@ import ProblemsPage from "./Pages/ProblemsPage";
 import SessionPage from "./Pages/SessionPage";
 
 const App = () => {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isAuthenticated, isLoading } = useAuth();
 
-  if (!isLoaded) return null;
+  if (isLoading) return <div className="auth-loading" role="status">Loading...</div>;
 
   return (
     <div>
       <Routes>
-        <Route path="/" element={!isSignedIn ? <HomePage /> : <Navigate to={"/dashboard"} />} />
-        <Route path="/dashboard" element={isSignedIn ? <DashboardPage /> : <Navigate to={"/"} />} />
-        <Route path="/problems" element={isSignedIn ? <ProblemsPage /> : <Navigate to={"/"} />} />
-        <Route path="/problem/:id" element={isSignedIn ? <ProblemPage /> : <Navigate to={"/"} />} />
-        <Route path="/session/:id" element={isSignedIn ? <SessionPage /> : <Navigate to={"/"} />} />
+        <Route path="/" element={!isAuthenticated ? <HomePage /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+        <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignupPage />} />
+        <Route path="/dashboard" element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" replace />} />
+        <Route path="/problems" element={isAuthenticated ? <ProblemsPage /> : <Navigate to="/login" replace />} />
+        <Route path="/problem/:id" element={isAuthenticated ? <ProblemPage /> : <Navigate to="/login" replace />} />
+        <Route path="/session/:id" element={isAuthenticated ? <SessionPage /> : <Navigate to="/login" replace />} />
       </Routes>
       <Toaster toastOptions={{ duration: 3000 }} />
     </div>
